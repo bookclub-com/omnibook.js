@@ -1,0 +1,38 @@
+{
+  "name": "omnibook",
+  "version": "0.0.2",
+  "description": "Official BookClub package for the Omnibook",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/bookclub-com/omnibook.js.git"
+  },
+  "author": "BookClub, Inc.",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bookclub-com/omnibook.js/issues"
+  },
+  "homepage": "https://github.com/bookclub-com/omnibook.js#readme",
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/node": "^20.10.5",
+    "@types/uuid": "^9.0.7",
+    "eslint": "^8.56.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@editorjs/editorjs": "^2.29.0",
+    "@editorjs/embed": "^2.7.0",
+    "@editorjs/header": "^2.8.1",
+    "@editorjs/image": "^2.9.0",
+    "@editorjs/list": "^1.9.0",
+    "@editorjs/paragraph": "^2.10.0",
+    "crypto-js": "^4.2.0",
+    "uuid": "^9.0.1",
+    "xml-js": "^1.6.11"
+  }
+}
