@@ -7,7 +7,8 @@ export default tseslint.config({
     ...tseslint.configs.strict,
     ...tseslint.configs.stylistic,
   ],
-  ignores: ['dist/**/*', 'node_modules/'],
+  // I can't figure out why sometimes dist/index.cjs appears in lint errors
+  ignores: ['dist/**'],
     rules: {
       "@typescript-eslint/no-non-null-assertion": "off",
       "@typescript-eslint/no-unused-vars": [ "error", { "ignoreRestSiblings": true,
