@@ -2,10 +2,16 @@
   "name": "omnibook",
   "version": "0.0.2",
   "description": "Official BookClub package for the Omnibook",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup",
+    "test": "jest"
   },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/bookclub-com/omnibook.js.git"
@@ -18,10 +24,14 @@
   "homepage": "https://github.com/bookclub-com/omnibook.js#readme",
   "devDependencies": {
     "@types/crypto-js": "^4.2.2",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20.10.5",
     "@types/uuid": "^9.0.7",
     "eslint": "^8.56.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
+    "tsup": "^8.1.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
