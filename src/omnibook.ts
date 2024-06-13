@@ -54,6 +54,11 @@ export class Omnibook {
     }
   }
 
+  // Public interface to convert to db storable object
+  toJSON(): IOmnibook {
+    return this.json;
+  }
+
   getSparkBranches(): Omnigraph[] {
     const ids = this.omnigraph.blocks.filter((block) => block.type === BaseBlockTypes.SPARK).map((block) => block.id);
     const branches = ids.map((id: ID) => this.omnigraph.getOmnigraphBranch(id, [IBookBlockRelationships.HAS_BLOCK]));
