@@ -8,7 +8,7 @@
     "clean": "rm -rf dist && rm -rf node_modules && rm -rf tsconfig.tsbuildinfo",
     "lint": "eslint",
     "test": "jest",
-    "postinstall": "tsc --outDir ./build"
+    "postinstall": "tsc --outDir ./dist"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
