@@ -8,7 +8,8 @@
     "clean": "rm -rf dist && rm -rf node_modules && rm -rf tsconfig.tsbuildinfo",
     "lint": "eslint",
     "test": "jest",
-    "postinstall": "tsc --outDir ./dist"
+    "build:component": "rollup -c build/rollup.config.js",
+    "prepare": "yarn build:component || npm run build:component"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
