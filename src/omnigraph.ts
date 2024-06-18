@@ -192,6 +192,10 @@ export class Omnigraph {
     });
   }
 
+  removeEdge(id: ID): void {
+    this._edges.delete(id);
+  }
+
   // takes a block, traverses up the tree to where the current parent is, backs off one layer, and then maps that block to the new parent
   remapParent(blockId: ID, currentParentId: ID, newParentId: ID): void {
     // Recursive function to find the immediate parent block that directly points to the current parent

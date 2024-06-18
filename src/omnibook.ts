@@ -36,11 +36,10 @@ export class Omnibook {
     // ID of the Book block (note capital "B"). This is the seed block that omnibooks require for instantiation
     const bookBlockId = (book_blocks || []).find((block) => block.type === BaseBlockTypes.BOOK)?.id;
 
-    if (!bookBlockId) {
+    if (!bookBlockId)
       throw new Error('Book block required for Omnibook instantiation. None found in the provided data.');
-    } else {
-      this._book_block_id = bookBlockId;
-    }
+
+    this._book_block_id = bookBlockId;
 
     if (omnigraph) {
       this._omnigraph = Omnigraph.buildGraph(omnigraph.blocks, omnigraph.edges, omnigraph.entryBlockId);
