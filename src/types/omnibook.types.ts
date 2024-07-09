@@ -45,11 +45,16 @@ export interface IOmnibookData {
 
 export interface IOmnibook {
   id?: ID;
-  book_hash: string;
-  version: string;
-  data: IOmnibookData;
   book_blocks?: IBookBlock[];
+  book_hash: string;
+  data: IOmnibookData;
+  enriched_at?: Date;
+  exported_booksplanations_at?: Date;
+  generated_spark_decks_at?: Date;
+  indexed_entities_at?: Date;
+  mongo_id?: string;
   omnigraph?: IOmniGraph;
+  version: string;
 }
 
 export enum BlockTextSizes {
