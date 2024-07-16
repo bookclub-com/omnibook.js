@@ -327,4 +327,64 @@ export class Omnibook {
     }
     return booksplanations;
   }
+
+  // Converts decks to editorjs
+  exportDecks = async (): Promise<IExportedBooksplanation[]> => {
+    const booksplanations: IExportedBooksplanation[] = [];
+
+    this.omnigraph.rawBookBlocksWithEdges;
+    for (const sparkBranch of this.getSparkBranches()) {
+      if (sparkBranch.sparkType !== SparkTypes.DECK) continue;
+      if (!sparkBranch.entryBlockId) continue;
+
+      // This infinate loops and I can't figure out how this is different from the sparks table. It goes infinately deep looking up the same ~20 ids
+      const render = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId!);
+      if (render.children.length === 0) continue;
+
+      // NO changes here onward from the booksplanation exporter - INCOMPLETE
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const blocks: any[] = [];
+
+      for (const child of render.children) {
+        const newBlocks = child.block.toBooksplanationEditorJS();
+        if (newBlocks) {
+          blocks.push(...newBlocks);
+        }
+      }
+
+      // const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
+
+      booksplanations.push({
+        bookCoverImageUrl: this.data.cover_image
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
+          : undefined,
+        bookHash: this.bookHash,
+        sparkBranchId: sparkBranch.entryBlockId,
+        data: {
+          cover_image_theme: this.data.cover_image_theme,
+          cover_image: this.data.cover_image,
+          creation_date: this.data.creation_date,
+          creators: this.data.creators,
+          description: this.data.description,
+          imprint: this.data.imprint,
+          isbn: this.data.isbn,
+          lcsh: this.data.lcsh,
+          publisher: this.data.publisher,
+          subtitle: this.data.subtitle,
+          title: this.data.title,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        description: (render.block.properties as any).summary,
+        editorJS: {
+          time: new Date().getTime(),
+          version: '2.29.0', // How to get this from the package?
+          blocks,
+        },
+        // bookclubAiSparkImageUrl: sparkImageFileName ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
+        title: (render.block.properties.text || [])[0],
+      });
+    }
+    return booksplanations;
+  };
 }
