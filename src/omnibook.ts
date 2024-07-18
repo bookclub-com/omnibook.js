@@ -349,7 +349,9 @@ export class Omnibook {
       const blocks: any[] = [];
 
       for (const child of render.children) {
-        const newBlocks = child.block.toBooksplanationEditorJS();
+        console.log("children", child.children.length)
+        const newBlocks = child.block.toDeckEditorJS(child.children);
+        console.log("newBlocks", newBlocks)
         if (newBlocks) {
           blocks.push(...newBlocks);
         }
