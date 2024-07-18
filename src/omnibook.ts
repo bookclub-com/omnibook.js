@@ -337,6 +337,8 @@ export class Omnibook {
       if (sparkBranch.sparkType !== SparkTypes.DECK) continue;
       if (!sparkBranch.entryBlockId) continue;
 
+      console.log("sparkBranch.entryBlockId", sparkBranch.entryBlockId);
+
       // This infinate loops and I can't figure out how this is different from the sparks table. It goes infinately deep looking up the same ~20 ids
       const render = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId!);
       if (render.children.length === 0) continue;
@@ -352,6 +354,8 @@ export class Omnibook {
           blocks.push(...newBlocks);
         }
       }
+
+      console.log("turned onto blocks", blocks.length)
 
       // const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
 
