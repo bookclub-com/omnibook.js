@@ -241,6 +241,7 @@ export class BookBlock<T extends IBookBlock> {
 
   toDeckEditorJS(children: IRenderBlock['children']): OutputBlockData[] | null {
     const texts = this.getRawBlockText();
+    console.log("type", this.type, "texts", texts);
     switch (this.type) {
       case BaseBlockTypes.TEXT:
         if (texts.length === 0) return [];
@@ -335,7 +336,7 @@ export class BookBlock<T extends IBookBlock> {
           },
         ];
       default:
-        console.log('Unhandled block type found', this.type, this, 'chilrden', children);
+        console.log('Unhandled block type found', this.type, this, 'children', children);
         return [];
     }
   }
