@@ -281,6 +281,7 @@ export class BookBlock<T extends IBookBlock> {
               break;
             }
             case 'text':
+            case undefined: // Is this ok or an issue from upstream?
               { 
               for (const text of texts) {
                 if (text.trim().length === 0) break;
