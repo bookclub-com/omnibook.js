@@ -344,77 +344,35 @@ export class Omnibook {
       const render = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId!);
       if (render.children.length === 0) continue;
 
-      const slides: IExportedDeckSlide[] = [
-        {
-          slideType: SlideTypes.COVER,
-        },
-        ...render.children.map((slidePart) => {
-          const slideType = slidePart.block.properties.slide_part || slidePart.block.properties.slide_type;
-          console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part, slideType)
-          if (!slideType) {
-            console.log("no slideType for", slidePart);
-            return;
-          }
+      const slides: IExportedDeckSlide[] = render.children.map((slidePart) => {
+        const slideType = slidePart.block.properties.slide_part || slidePart.block.properties.slide_type;
+        console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part, slideType)
+        if (!slideType) {
+          console.log("no slideType for", slidePart);
+          return;
+        }
 
-          const blocks = slidePart.children.flatMap((child) => child.block.toDeckEditorJS(child.children));
-          if (!blocks.length) {
-            console.log("no blocks for", slidePart);
-            return;
-          }
+        const blocks = slidePart.children.flatMap((child) => child.block.toDeckEditorJS(child.children));
+        if (!blocks.length) {
+          console.log("no blocks for", slidePart);
+          return;
+        }
 
-          return {
-            slideType,
-            editorJS: {
-              time: new Date().getTime(),
-              version: '2.29.0', // How to get this from the package?
-              blocks,
-            },
-          }
-        }).filter((slide) => slide) as IExportedDeckSlide[],
-      ];
-
-      // // eslint-disable-next-line @typescript-eslint/prefer-for-of
-      // for (let i = 0; i < render.children.length; i++) {
-      //   let slidePart = render.children[i];
-      //   if (slidePart.block.type !== BaseBlockTypes.SECTION) continue;
-
-      //   switch (slidePart.block.properties.slide_part) {
-      //   case SlideParts.QUOTE:
-      //     const slide = {
-      //       slideType: SlideTypes.QUOTE,
-      //       editorJS: {
-      //         time: new Date().getTime(),
-      //         version: '2.29.0', // How to get this from the package?
-      //         blocks: [
-      //           slidePart.block.toBooksplanationEditorJS(),
-      //         ],
-      //       },
-      //     };
-      //     if (i + 1 < render.children.length) {
-      //       slidePart = render.children[i + 1];
-      //       if (slidePart.block.properties.slide_part === SlideParts.QUOTE) {
-      //         i++;
-      //         slide.editorJS.blocks.push(slidePart.block.toBooksplanationEditorJS());
-      //       }
-      //     }
-      //     slides.push(slide);
-
-      //   console.log("slidePart pieces", slidePart.children.length, slidePart.block.properties.slide_type, slidePart.block.properties.slide_part)
-      //   const newSlides = slidePart.block.toDeckEditorJS(slidePart.children);
-      //   console.log("newSlides", newSlides)
-      //   if (newSlides) {
-      //     slides.push({
-      //       slideType: slidePart.block.properties.slide_type!,
-      //       editorJS: {
-      //         time: new Date().getTime(),
-      //         version: '2.29.0', // How to get this from the package?
-      //         blocks: newSlides,
-      //       },
-      //     });
-      //   }
-      // }
+        return {
+          slideType,
+          editorJS: {
+            time: new Date().getTime(),
+            version: '2.29.0', // How to get this from the package?
+            blocks,
+          },
+        }
+      }).filter((slide) => slide) as IExportedDeckSlide[];
 
       console.log("turned onto slides", slides.length, slides)
+      if (!slides.length) {
+        console.log("Deck with no slides", sparkBranch.entryBlockId);
+        continue;
+      }
 
       // const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
 
@@ -439,7 +397,12 @@ export class Omnibook {
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         description: (render.block.properties as any).summary,
-        slides,
+        slides: [
+          {
+            slideType: SlideTypes.COVER,
+          },
+          ...slides,
+        ],
         // bookclubAiSparkImageUrl: sparkImageFileName ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
         title: (render.block.properties.text || [])[0],
       });
