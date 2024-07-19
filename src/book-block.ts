@@ -247,13 +247,13 @@ export class BookBlock<T extends IBookBlock> {
     // console.log("type", this.type, "texts", texts);
     const slides: OutputBlockData[] = [];
     for (const child of children) {
-      console.log("child", child);
       const block = child.block;
       const texts = block.getRawBlockText();
+      console.log("block.type", block.type, "child", child, texts);
       switch (block.type) {
         case BaseBlockTypes.TEXT:
-          if (texts.length === 0) continue;
-          if (texts.length === 1 && texts[0] === 'undefined') continue;
+          if (texts.length === 0) break;
+          if (texts.length === 1 && texts[0] === 'undefined') break;
           switch (this._format.text_size) {
             case 'header':
             case 'sub_header':
@@ -266,7 +266,7 @@ export class BookBlock<T extends IBookBlock> {
                 }
               }
               headerText ||= texts[0].trim();
-              if (headerText.length == 0) continue;
+              if (headerText.length == 0) break;
 
               slides.push(
                 {
@@ -278,12 +278,12 @@ export class BookBlock<T extends IBookBlock> {
                   },
                 },
               ); 
-              continue;
+              break;
             }
             case 'text':
               { 
               for (const text of texts) {
-                if (text.trim().length === 0) continue;
+                if (text.trim().length === 0) break;
 
                 slides.push({
                   id: this._id,
@@ -302,11 +302,11 @@ export class BookBlock<T extends IBookBlock> {
                   },
                 });
               }
-              continue; }
+              break; }
             default:
               console.log('Unhandled format found', this._format.text_size, this);
-              continue;
           }
+          break;
         case BaseBlockTypes.IMAGE:
             slides.push({
               id: this._id,
@@ -317,7 +317,7 @@ export class BookBlock<T extends IBookBlock> {
                 },
               },
             })
-            continue
+            break
         case BaseBlockTypes.ORDERED_LIST:
           slides.push({
               type: 'list',
@@ -329,7 +329,7 @@ export class BookBlock<T extends IBookBlock> {
                   .filter((text: string) => text?.toString().trim().length > 0),
               },
             })
-            continue
+            break
         case BaseBlockTypes.UNORDERED_LIST:
           slides.push({
               type: 'list',
@@ -341,10 +341,9 @@ export class BookBlock<T extends IBookBlock> {
                   .filter((text: string) => text?.toString().trim().length > 0),
               },
             });
-            continue
+            break
         default:
           console.log('Unhandled block type found', this.type, this, 'children', children);
-          continue;
       }
     }
     if (slides.length)
