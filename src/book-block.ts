@@ -281,11 +281,11 @@ export class BookBlock<T extends IBookBlock> {
               continue;
             }
             case 'text':
-              { const result: OutputBlockData[] = [];
+              { 
               for (const text of texts) {
                 if (text.trim().length === 0) continue;
 
-                result.push({
+                slides.push({
                   id: this._id,
                   type: 'paragraph',
                   data: {
@@ -294,7 +294,7 @@ export class BookBlock<T extends IBookBlock> {
                 });
 
                 // Blank paragraph after every paragraph so editorjs renders prettily
-                result.push({
+                slides.push({
                   id: `${this._id}-blank-paragraph`,
                   type: 'paragraph',
                   data: {
@@ -302,14 +302,13 @@ export class BookBlock<T extends IBookBlock> {
                   },
                 });
               }
-              return result; }
+              continue; }
             default:
               console.log('Unhandled format found', this._format.text_size, this);
               continue;
           }
         case BaseBlockTypes.IMAGE:
-          return [
-            {
+            slides.push({
               id: this._id,
               type: 'image',
               data: {
@@ -317,11 +316,10 @@ export class BookBlock<T extends IBookBlock> {
                   url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${this.properties!.source!.join('/')}`,
                 },
               },
-            },
-          ];
+            })
+            continue
         case BaseBlockTypes.ORDERED_LIST:
-          return [
-            {
+          slides.push({
               type: 'list',
               data: {
                 style: 'ordered',
@@ -330,11 +328,10 @@ export class BookBlock<T extends IBookBlock> {
                   .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
                   .filter((text: string) => text?.toString().trim().length > 0),
               },
-            },
-          ];
+            })
+            continue
         case BaseBlockTypes.UNORDERED_LIST:
-          return [
-            {
+          slides.push({
               type: 'list',
               data: {
                 style: 'unordered',
@@ -343,8 +340,8 @@ export class BookBlock<T extends IBookBlock> {
                   .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
                   .filter((text: string) => text?.toString().trim().length > 0),
               },
-            },
-          ];
+            });
+            continue
         default:
           console.log('Unhandled block type found', this.type, this, 'children', children);
           continue;
