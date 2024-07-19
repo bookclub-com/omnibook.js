@@ -351,16 +351,28 @@ export class Omnibook {
           slideType: SlideTypes.COVER,
         },
         ...render.children.map((slidePart) => {
-          console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part)
+          const slideType = slidePart.block.properties.slide_part || slidePart.block.properties.slide_type;
+          console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part, slideType)
+          if (!slideType) {
+            console.log("no slideType for", slidePart);
+            return;
+          }
+
+          const blocks = slidePart.children.flatMap((child) => child.block.toDeckEditorJS(child.children));
+          if (!blocks.length) {
+            console.log("no blocks for", slidePart);
+            return;
+          }
+
           return {
-            slideType: slidePart.block.properties.slide_part || slidePart.block.properties.slide_type!,
+            slideType,
             editorJS: {
               time: new Date().getTime(),
               version: '2.29.0', // How to get this from the package?
-              blocks: slidePart.children.flatMap((child) => child.block.toDeckEditorJS(child.children)),
+              blocks,
             },
           }
-        }),
+        }).filter((slide) => slide) as IExportedDeckSlide[],
       ];
 
       // // eslint-disable-next-line @typescript-eslint/prefer-for-of
