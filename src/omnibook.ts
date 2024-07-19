@@ -16,7 +16,7 @@ import { CoreConceptVals, INavItem } from './types/bc-epub.types';
 import { uuid } from './types/utils';
 import { BookBlock } from './book-block';
 import { Omnigraph } from './omnigraph';
-import { IExportedBooksplanation, IExportedDeckSlide } from './booksplanation-export-structure';
+import { IExportedBooksplanation, IExportedDeck, IExportedDeckSlide } from './booksplanation-export-structure';
 
 const isSectionBlock = (block: IBookBlock): block is ISectionBlock => block.type === BaseBlockTypes.SECTION;
 
@@ -330,8 +330,8 @@ export class Omnibook {
   }
 
   // Converts decks to editorjs
-  exportDecks = async (): Promise<IExportedBooksplanation[]> => {
-    const decks: IExportedBooksplanation[] = [];
+  exportDecks = async (): Promise<IExportedDeck[]> => {
+    const decks: IExportedDeck[] = [];
 
     this.omnigraph.rawBookBlocksWithEdges;
     for (const sparkBranch of this.getSparkBranches()) {
@@ -396,11 +396,7 @@ export class Omnibook {
         },
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         description: (render.block.properties as any).summary,
-        editorJS: {
-          time: new Date().getTime(),
-          version: '2.29.0', // How to get this from the package?
-          blocks: slides,
-        },
+        slides,
         // bookclubAiSparkImageUrl: sparkImageFileName ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
         title: (render.block.properties.text || [])[0],
       });
