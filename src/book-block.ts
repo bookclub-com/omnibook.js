@@ -309,6 +309,13 @@ export class BookBlock<T extends IBookBlock> {
           }
           break;
         case BaseBlockTypes.IMAGE:
+          { 
+            const imageSource = this.properties!.source;
+            if (!imageSource) {
+              console.log("No image source found. BUG!", this.properties, this);
+              break;
+            }
+
             slides.push({
               id: this._id,
               type: 'image',
@@ -318,19 +325,20 @@ export class BookBlock<T extends IBookBlock> {
                 },
               },
             })
-            break
+            break 
+          }
         case BaseBlockTypes.ORDERED_LIST:
           slides.push({
-              type: 'list',
-              data: {
-                style: 'ordered',
-                items: children
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
-                  .filter((text: string) => text?.toString().trim().length > 0),
-              },
-            })
-            break
+            type: 'list',
+            data: {
+              style: 'ordered',
+              items: children
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
+                .filter((text: string) => text?.toString().trim().length > 0),
+            },
+          })
+          break
         case BaseBlockTypes.UNORDERED_LIST:
           slides.push({
               type: 'list',
