@@ -400,6 +400,11 @@ export class Omnibook {
         slides: [
           {
             slideType: SlideTypes.COVER,
+            editorJS: {
+              time: new Date().getTime(),
+              version: '2.29.0', // How to get this from the package?
+              blocks: [],
+            },
           },
           ...slides,
         ],
