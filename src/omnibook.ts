@@ -350,28 +350,60 @@ export class Omnibook {
         {
           slideType: SlideTypes.COVER,
         },
-
-      ];
-
-      for (const slidePart of render.children) {
-        if (slidePart.block.type !== BaseBlockTypes.SECTION) continue;
-
-        console.log("slidePart pieces", slidePart.children.length, slidePart.block.properties.slide_type, slidePart.block.properties.slide_part)
-        const newSlides = slidePart.block.toDeckEditorJS(slidePart.children);
-        console.log("newSlides", newSlides)
-        if (newSlides) {
-          slides.push({
-            slideType: slidePart.block.properties.slide_type!,
+        ...render.children.map((slidePart) => {
+          return {
+            slideType: slidePart.block.properties.slide_part!.toString(),
             editorJS: {
               time: new Date().getTime(),
               version: '2.29.0', // How to get this from the package?
-              blocks: newSlides,
+              blocks: slidePart.children.flatMap((child) => child.block.toDeckEditorJS(child.children)),
             },
-          });
-        }
-      }
+          }
+        }),
+      ];
 
-      console.log("turned onto slides", slides.length)
+      // // eslint-disable-next-line @typescript-eslint/prefer-for-of
+      // for (let i = 0; i < render.children.length; i++) {
+      //   let slidePart = render.children[i];
+      //   if (slidePart.block.type !== BaseBlockTypes.SECTION) continue;
+
+      //   switch (slidePart.block.properties.slide_part) {
+      //   case SlideParts.QUOTE:
+      //     const slide = {
+      //       slideType: SlideTypes.QUOTE,
+      //       editorJS: {
+      //         time: new Date().getTime(),
+      //         version: '2.29.0', // How to get this from the package?
+      //         blocks: [
+      //           slidePart.block.toBooksplanationEditorJS(),
+      //         ],
+      //       },
+      //     };
+      //     if (i + 1 < render.children.length) {
+      //       slidePart = render.children[i + 1];
+      //       if (slidePart.block.properties.slide_part === SlideParts.QUOTE) {
+      //         i++;
+      //         slide.editorJS.blocks.push(slidePart.block.toBooksplanationEditorJS());
+      //       }
+      //     }
+      //     slides.push(slide);
+
+      //   console.log("slidePart pieces", slidePart.children.length, slidePart.block.properties.slide_type, slidePart.block.properties.slide_part)
+      //   const newSlides = slidePart.block.toDeckEditorJS(slidePart.children);
+      //   console.log("newSlides", newSlides)
+      //   if (newSlides) {
+      //     slides.push({
+      //       slideType: slidePart.block.properties.slide_type!,
+      //       editorJS: {
+      //         time: new Date().getTime(),
+      //         version: '2.29.0', // How to get this from the package?
+      //         blocks: newSlides,
+      //       },
+      //     });
+      //   }
+      // }
+
+      console.log("turned onto slides", slides.length, slides)
 
       // const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
 
