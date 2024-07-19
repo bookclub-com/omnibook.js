@@ -350,8 +350,8 @@ export class BookBlock<T extends IBookBlock> {
           continue;
       }
     }
-    if (result.length)
-      return result;
+    if (slides.length)
+      return slides;
     return null;
   }
 
