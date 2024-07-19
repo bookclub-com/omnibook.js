@@ -353,7 +353,7 @@ export class Omnibook {
         ...render.children.map((slidePart) => {
           console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part)
           return {
-            slideType: slidePart.block.properties.slide_part!.toString(),
+            slideType: slidePart.block.properties.slide_part || slidePart.block.properties.slide_type!,
             editorJS: {
               time: new Date().getTime(),
               version: '2.29.0', // How to get this from the package?
