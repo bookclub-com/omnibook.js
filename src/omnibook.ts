@@ -360,7 +360,7 @@ export class Omnibook {
 
         return {
           slideType,
-          editorJS: {
+          slideData: {
             time: new Date().getTime(),
             version: '2.29.0', // How to get this from the package?
             blocks,
@@ -400,7 +400,7 @@ export class Omnibook {
         slides: [
           {
             slideType: SlideTypes.COVER,
-            editorJS: {
+            slideData: {
               time: new Date().getTime(),
               version: '2.29.0', // How to get this from the package?
               blocks: [],

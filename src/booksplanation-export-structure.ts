@@ -47,7 +47,7 @@ export interface IExportedBooksplanation {
 }
 
 export interface IExportedDeckSlide {
-  editorJS: OutputData;
+  slideData: OutputData;
   slideHeader?: string;
   slideType: string;
 }
