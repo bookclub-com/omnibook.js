@@ -172,9 +172,20 @@ export class Omnigraph {
     return branch;
   }
 
-  getRenderBlocks(id: ID, edgeTypes: IBookBlockRelationTypes[] = [], order = 0): IRenderBlock {
+  getRenderBlocks(id: ID, edgeTypes: IBookBlockRelationTypes[] = [], order = 0, { pastIds }: { pastIds?: string[] } = {}): IRenderBlock {
     const block = this.getBlockById(id, edgeTypes) as BookBlock<IBookBlock>;
-    const children = block.edges.map((edge: IBookBlockRelationship) => this.getRenderBlocks(edge.block_b_id, edgeTypes, order++));
+    // Deck export is infinite looping on the same block. This is a temporary fix to prevent that. I don't know why it's happening in deck export but not on the blocks table.
+    pastIds ||= [];
+    if (pastIds.includes(block.id)) {
+      return {
+        block,
+        children: [],
+        order,
+      };
+    }
+
+    pastIds.push(block.id);
+    const children = block.edges.map((edge: IBookBlockRelationship) => this.getRenderBlocks(edge.block_b_id, edgeTypes, order++, { pastIds }));
     return {
       block,
       children,

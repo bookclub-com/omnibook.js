@@ -344,8 +344,6 @@ export class Omnibook {
       const render = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId!);
       if (render.children.length === 0) continue;
 
-      // NO changes here onward from the booksplanation exporter - INCOMPLETE
-
       const slides: IExportedDeckSlide[] = [
         {
           slideType: SlideTypes.COVER,
