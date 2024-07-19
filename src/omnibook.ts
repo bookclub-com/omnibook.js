@@ -351,6 +351,7 @@ export class Omnibook {
           slideType: SlideTypes.COVER,
         },
         ...render.children.map((slidePart) => {
+          console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part)
           return {
             slideType: slidePart.block.properties.slide_part!.toString(),
             editorJS: {
