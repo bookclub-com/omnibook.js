@@ -1,4 +1,4 @@
-import { SlideTypes } from './omnibook.types';
+import { SlideParts, SlideTypes } from './omnibook.types';
 
 export type HtmlElements =
   | 'navLabel'
@@ -80,6 +80,7 @@ interface ITocElementAttrs {
   // attributes i'm adding manually to th `bc-section` element
   'epub-id'?: string;
   label?: string;
+  'slide-part'?: SlideParts;
   'slide-type'?: SlideTypes;
 }
 export interface ITocElement {

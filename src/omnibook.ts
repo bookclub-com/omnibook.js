@@ -9,13 +9,14 @@ import {
   IOmnibookData,
   ISection,
   ISectionBlock,
+  SlideTypes,
   SparkTypes,
 } from './types/omnibook.types';
 import { CoreConceptVals, INavItem } from './types/bc-epub.types';
 import { uuid } from './types/utils';
 import { BookBlock } from './book-block';
 import { Omnigraph } from './omnigraph';
-import { IExportedBooksplanation } from './booksplanation-export-structure';
+import { IExportedBooksplanation, IExportedDeckSlide } from './booksplanation-export-structure';
 
 const isSectionBlock = (block: IBookBlock): block is ISectionBlock => block.type === BaseBlockTypes.SECTION;
 
@@ -330,7 +331,7 @@ export class Omnibook {
 
   // Converts decks to editorjs
   exportDecks = async (): Promise<IExportedBooksplanation[]> => {
-    const booksplanations: IExportedBooksplanation[] = [];
+    const decks: IExportedBooksplanation[] = [];
 
     this.omnigraph.rawBookBlocksWithEdges;
     for (const sparkBranch of this.getSparkBranches()) {
@@ -345,23 +346,36 @@ export class Omnibook {
 
       // NO changes here onward from the booksplanation exporter - INCOMPLETE
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const blocks: any[] = [];
+      const slides: IExportedDeckSlide[] = [
+        {
+          slideType: SlideTypes.COVER,
+        },
 
-      for (const child of render.children) {
-        console.log("children", child.children.length)
-        const newBlocks = child.block.toDeckEditorJS(child.children);
-        console.log("newBlocks", newBlocks)
-        if (newBlocks) {
-          blocks.push(...newBlocks);
+      ];
+
+      for (const slidePart of render.children) {
+        if (slidePart.block.type !== BaseBlockTypes.SECTION) continue;
+
+        console.log("slidePart pieces", slidePart.children.length, slidePart.block.properties.slide_type, slidePart.block.properties.slide_part)
+        const newSlides = slidePart.block.toDeckEditorJS(slidePart.children);
+        console.log("newSlides", newSlides)
+        if (newSlides) {
+          slides.push({
+            slideType: slidePart.block.properties.slide_type!,
+            editorJS: {
+              time: new Date().getTime(),
+              version: '2.29.0', // How to get this from the package?
+              blocks: newSlides,
+            },
+          });
         }
       }
 
-      console.log("turned onto blocks", blocks.length)
+      console.log("turned onto slides", slides.length)
 
       // const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
 
-      booksplanations.push({
+      decks.push({
         bookCoverImageUrl: this.data.cover_image
           ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
           : undefined,
@@ -385,12 +399,12 @@ export class Omnibook {
         editorJS: {
           time: new Date().getTime(),
           version: '2.29.0', // How to get this from the package?
-          blocks,
+          blocks: slides,
         },
         // bookclubAiSparkImageUrl: sparkImageFileName ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
         title: (render.block.properties.text || [])[0],
       });
     }
-    return booksplanations;
+    return decks;
   };
 }

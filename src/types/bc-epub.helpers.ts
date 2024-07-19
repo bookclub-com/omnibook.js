@@ -21,6 +21,7 @@ import {
   ITableRowBlock,
   ITextBlock,
   IUnorderedListBlock,
+  SlideParts,
   SlideTypes,
 } from './omnibook.types';
 import { makeFilenameSafe } from './utils';
@@ -39,6 +40,7 @@ const extractSectionBlock: IBlockBuilder = (opts: BlockMappingOpts): BookBlock<I
       text: text ? [text] : [],
       href: opts.element.attributes?.href as string,
       anchor: opts.element.attributes?.id as string,
+      slide_part: opts.element.attributes?.['slide-part'] as SlideParts,
       slide_type: opts.element.attributes?.['slide-type'] as SlideTypes,
     },
     format,

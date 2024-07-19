@@ -178,6 +178,7 @@ export interface IBookBlockProperties {
 
   anchor?: string;
 
+  slide_part?: SlideParts;
   slide_type?: SlideTypes;
 }
 export interface IBookBlockFormat {
@@ -267,6 +268,14 @@ export enum SlideTypes {
   HEADER = 'header',
 }
 
+export enum SlideParts {
+  INTRODUCTION = 'introduction',
+  QUOTE = 'quote',
+  WHO_WHAT = 'whoWhat',
+  WHY_MATTER = 'whyMatter',
+  REAL_LIFE = 'realLife',
+}
+
 // Book section. could be a chapter, part, appendix, etc. anything that contains the other book blocks
 export interface ISectionBlock extends IBookBlockBase {
   type: BaseBlockTypes.SECTION;
@@ -276,6 +285,7 @@ export interface ISectionBlock extends IBookBlockBase {
     epub_id?: string;
     href?: string;
     anchor?: string;
+    slide_part?: SlideParts;
     slide_type?: SlideTypes;
   };
 }

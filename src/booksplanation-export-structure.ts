@@ -46,6 +46,12 @@ export interface IExportedBooksplanation {
   sparkImageUrl?: string; // Only set by Bookclub Core
 }
 
+export interface IExportedDeckSlide {
+  editorJS?: OutputData;
+  slideHeader?: string;
+  slideType: string;
+}
+
 // This format must match exactly what is expected by the ops tool
 export interface IExportedDeck {
   bookCoverImageUrl?: string;
@@ -68,7 +74,7 @@ export interface IExportedDeck {
     };
   };
   data: IExportedOmnibookData;
-  slides: { slideType: string; editorJS: OutputData; slideHeader?: string }[];
+  slides: IExportedDeckSlide[];
   sparkBranchId?: string;
   title: string;
   description?: string;

@@ -240,105 +240,119 @@ export class BookBlock<T extends IBookBlock> {
   }
 
   toDeckEditorJS(children: IRenderBlock['children']): OutputBlockData[] | null {
-    const texts = this.getRawBlockText();
-    console.log("type", this.type, "texts", texts);
-    switch (this.type) {
-      case BaseBlockTypes.TEXT:
-        if (texts.length === 0) return [];
-        if (texts.length === 1 && texts[0] === 'undefined') return [];
-        switch (this._format.text_size) {
-          case 'header':
-          case 'sub_header':
-            { let headerText: string;
+    // I am a slide part. See 
+    this.properties.slide_part
+    if (this.type !== BaseBlockTypes.SECTION) return null;
+    // const texts = this.getRawBlockText();
+    // console.log("type", this.type, "texts", texts);
+    const slides: OutputBlockData[] = [];
+    for (const child of children) {
+      console.log("child", child);
+      const block = child.block;
+      const texts = block.getRawBlockText();
+      switch (block.type) {
+        case BaseBlockTypes.TEXT:
+          if (texts.length === 0) continue;
+          if (texts.length === 1 && texts[0] === 'undefined') continue;
+          switch (this._format.text_size) {
+            case 'header':
+            case 'sub_header':
+              { let headerText: string;
 
-            for (const styling of this._format.styling || []) {
-              if (styling.style === 'bold') {
-                headerText = texts[styling.index].trim();
-                break;
+              for (const styling of this._format.styling || []) {
+                if (styling.style === 'bold') {
+                  headerText = texts[styling.index].trim();
+                  break;
+                }
               }
-            }
-            headerText ||= texts[0].trim();
-            if (headerText.length == 0) return [];
+              headerText ||= texts[0].trim();
+              if (headerText.length == 0) continue;
 
-            return [
-              {
-                id: this._id,
-                type: 'header',
-                data: {
-                  text: headerText,
-                  level: 2,
+              slides.push(
+                {
+                  id: this._id,
+                  type: 'header',
+                  data: {
+                    text: headerText,
+                    level: 2,
+                  },
+                },
+              ); 
+              continue;
+            }
+            case 'text':
+              { const result: OutputBlockData[] = [];
+              for (const text of texts) {
+                if (text.trim().length === 0) continue;
+
+                result.push({
+                  id: this._id,
+                  type: 'paragraph',
+                  data: {
+                    text: text.trim(),
+                  },
+                });
+
+                // Blank paragraph after every paragraph so editorjs renders prettily
+                result.push({
+                  id: `${this._id}-blank-paragraph`,
+                  type: 'paragraph',
+                  data: {
+                    text: '',
+                  },
+                });
+              }
+              return result; }
+            default:
+              console.log('Unhandled format found', this._format.text_size, this);
+              continue;
+          }
+        case BaseBlockTypes.IMAGE:
+          return [
+            {
+              id: this._id,
+              type: 'image',
+              data: {
+                file: {
+                  url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${this.properties!.source!.join('/')}`,
                 },
               },
-            ]; }
-          case 'text':
-            { const result: OutputBlockData[] = [];
-            for (const text of texts) {
-              if (text.trim().length === 0) continue;
-
-              result.push({
-                id: this._id,
-                type: 'paragraph',
-                data: {
-                  text: text.trim(),
-                },
-              });
-
-              // Blank paragraph after every paragraph so editorjs renders prettily
-              result.push({
-                id: `${this._id}-blank-paragraph`,
-                type: 'paragraph',
-                data: {
-                  text: '',
-                },
-              });
-            }
-            return result; }
-          default:
-            console.log('Unhandled format found', this._format.text_size, this);
-            return [];
-        }
-      case BaseBlockTypes.IMAGE:
-        return [
-          {
-            id: this._id,
-            type: 'image',
-            data: {
-              file: {
-                url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${this.properties!.source!.join('/')}`,
+            },
+          ];
+        case BaseBlockTypes.ORDERED_LIST:
+          return [
+            {
+              type: 'list',
+              data: {
+                style: 'ordered',
+                items: children
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
+                  .filter((text: string) => text?.toString().trim().length > 0),
               },
             },
-          },
-        ];
-      case BaseBlockTypes.ORDERED_LIST:
-        return [
-          {
-            type: 'list',
-            data: {
-              style: 'ordered',
-              items: children
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
-                .filter((text: string) => text?.toString().trim().length > 0),
+          ];
+        case BaseBlockTypes.UNORDERED_LIST:
+          return [
+            {
+              type: 'list',
+              data: {
+                style: 'unordered',
+                items: children
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
+                  .filter((text: string) => text?.toString().trim().length > 0),
+              },
             },
-          },
-        ];
-      case BaseBlockTypes.UNORDERED_LIST:
-        return [
-          {
-            type: 'list',
-            data: {
-              style: 'unordered',
-              items: children
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                .flatMap((c: any) => c.children.flatMap((child: any) => child.block.properties.text))
-                .filter((text: string) => text?.toString().trim().length > 0),
-            },
-          },
-        ];
-      default:
-        console.log('Unhandled block type found', this.type, this, 'children', children);
-        return [];
+          ];
+        default:
+          console.log('Unhandled block type found', this.type, this, 'children', children);
+          continue;
+      }
     }
+    if (result.length)
+      return result;
+    return null;
   }
 
   get type(): IBookBlockType {
