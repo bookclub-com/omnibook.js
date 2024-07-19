@@ -239,7 +239,7 @@ export class BookBlock<T extends IBookBlock> {
     }
   }
 
-  toDeckEditorJS(children: IRenderBlock[]): OutputBlockData[] {
+  toDeckEditorJS(supabaseBaseUrl: string, children: IRenderBlock[]): OutputBlockData[] {
     const texts = this.getRawBlockText();
     console.log("type", this.type, "texts", texts);
     switch (this.type) {
@@ -312,7 +312,7 @@ export class BookBlock<T extends IBookBlock> {
             type: 'image',
             data: {
               file: {
-                url: `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${this.properties!.source!.join('/')}`,
+                url: `${supabaseBaseUrl}/storage/v1/object/public/${this.properties!.source!.join('/')}`,
               },
             },
           }]

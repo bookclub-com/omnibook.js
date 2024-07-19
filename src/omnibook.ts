@@ -269,7 +269,7 @@ export class Omnibook {
   }
 
   // Converts sparks to editorjs
-  async exportBooksplanations(): Promise<IExportedBooksplanation[]> {
+  async exportBooksplanations(supabaseBaseUrl: string): Promise<IExportedBooksplanation[]> {
     const booksplanations: IExportedBooksplanation[] = [];
 
     for (const sparkBranch of this.getSparkBranches()) {
@@ -293,7 +293,7 @@ export class Omnibook {
 
           booksplanations.push({
             bookCoverImageUrl: this.data.cover_image
-              ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
+              ? `${supabaseBaseUrl}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
               : undefined,
             bookHash: this.bookHash,
             sparkBranchId: sparkBranch.entryBlockId,
@@ -317,7 +317,7 @@ export class Omnibook {
               version: '2.29.0', // How to get this from the package?
               blocks,
             },
-            bookclubAiSparkImageUrl: sparkImageFileName ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
+            bookclubAiSparkImageUrl: sparkImageFileName ? `${supabaseBaseUrl}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
             title: (renderBlock.block.properties.text || [])[0],
           }); 
           break;
@@ -330,7 +330,7 @@ export class Omnibook {
   }
 
   // Converts decks to editorjs
-  exportDecks = async (): Promise<IExportedDeck[]> => {
+  exportDecks = async (supabaseBaseUrl: string): Promise<IExportedDeck[]> => {
     const decks: IExportedDeck[] = [];
 
     this.omnigraph.rawBookBlocksWithEdges;
@@ -345,14 +345,14 @@ export class Omnibook {
       if (render.children.length === 0) continue;
 
       const slides: IExportedDeckSlide[] = render.children.map((slidePart) => {
-        const slideType = slidePart.block.properties.slide_part || slidePart.block.properties.slide_type;
+        const slideType = slidePart.block.properties.slide_type;
         console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part, slideType)
         if (!slideType) {
           console.log("no slideType for", slidePart);
           return;
         }
 
-        const blocks = slidePart.children.flatMap((child) => child.block.toDeckEditorJS(child.children));
+        const blocks = slidePart.children.flatMap((child) => child.block.toDeckEditorJS(supabaseBaseUrl, child.children));
         if (!blocks.length) {
           console.log("no blocks for", slidePart);
           return;
@@ -378,7 +378,7 @@ export class Omnibook {
 
       decks.push({
         bookCoverImageUrl: this.data.cover_image
-          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
+          ? `${supabaseBaseUrl}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
           : undefined,
         bookHash: this.bookHash,
         sparkBranchId: sparkBranch.entryBlockId,
@@ -408,7 +408,7 @@ export class Omnibook {
           },
           ...slides,
         ],
-        // bookclubAiSparkImageUrl: sparkImageFileName ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
+        // bookclubAiSparkImageUrl: sparkImageFileName ? `${supabaseBaseUrl}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
         title: (render.block.properties.text || [])[0],
       });
     }
