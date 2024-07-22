@@ -353,12 +353,12 @@ export class Omnibook {
           return;
         }
 
-        const slideType = rawSlide.block.properties.slide_type;
-        console.log("rawSlide", rawSlide, "for", rawSlide.block.properties.slide_part, slideType)
-        if (!slideType) {
-          console.log("no slideType for", rawSlide);
-          return;
-        }
+        // const slideType = rawSlide.block.properties.slide_type;
+        // console.log("rawSlide", rawSlide, "for", rawSlide.block.properties.slide_part, slideType)
+        // if (!slideType) {
+        //   console.log("no slideType for", rawSlide);
+        //   return;
+        // }
 
         const blocks = rawSlide.children.flatMap((child) => child.block.toDeckEditorJS(supabaseBaseUrl, child.children));
         if (!blocks.length) {
