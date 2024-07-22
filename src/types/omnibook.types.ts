@@ -261,11 +261,12 @@ export interface IImageBlock extends IBookBlockBase {
 }
 
 export enum SlideTypes {
+  CONTENT = 'content',
   COVER = 'cover',
-  TITLE = 'title',
+  HEADER = 'header',
   QUOTE = 'quote',
   SECTION = 'section',
-  HEADER = 'header',
+  TITLE = 'title',
 }
 
 export enum SlideParts {

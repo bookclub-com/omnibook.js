@@ -9,6 +9,7 @@ import {
   IOmnibookData,
   ISection,
   ISectionBlock,
+  SlideParts,
   SlideTypes,
   SparkTypes,
 } from './types/omnibook.types';
@@ -344,29 +345,63 @@ export class Omnibook {
       const render = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId!);
       if (render.children.length === 0) continue;
 
-      const slides: IExportedDeckSlide[] = render.children.map((slidePart) => {
-        const slideType = slidePart.block.properties.slide_type;
-        console.log("slidePart", slidePart, "for", slidePart.block.properties.slide_part, slideType)
+      let slides: IExportedDeckSlide[] = []
+      render.children.forEach((rawSlide) => {
+        const slidePart = rawSlide.block.properties.slide_part;
+        if (!slidePart) {
+          console.log("no slidePart for", rawSlide);
+          return;
+        }
+
+        const slideType = rawSlide.block.properties.slide_type;
+        console.log("rawSlide", rawSlide, "for", rawSlide.block.properties.slide_part, slideType)
         if (!slideType) {
-          console.log("no slideType for", slidePart);
+          console.log("no slideType for", rawSlide);
           return;
         }
 
-        const blocks = slidePart.children.flatMap((child) => child.block.toDeckEditorJS(supabaseBaseUrl, child.children));
+        const blocks = rawSlide.children.flatMap((child) => child.block.toDeckEditorJS(supabaseBaseUrl, child.children));
         if (!blocks.length) {
-          console.log("no blocks for", slidePart);
+          console.log("no blocks for", rawSlide);
           return;
         }
 
-        return {
-          slideType,
+        const firstHeader = blocks.find((block) => block.type === 'header');
+        if (firstHeader) {
+          switch (slidePart) {
+            case SlideParts.INTRODUCTION:
+            case SlideParts.QUOTE:
+              break; // No pre-slide
+            case SlideParts.WHO_WHAT:
+            case SlideParts.WHY_MATTER:
+            case SlideParts.REAL_LIFE:
+              slides.push({
+                slideData: {
+                  time: new Date().getTime(),
+                  version: '2.29.0', // How to get this from the package?
+                  blocks: [{
+                    ...firstHeader,
+                    id: `${firstHeader.id}_section`,
+                  }]
+                },
+                slidePart,
+                slideType: SlideTypes.SECTION,
+              })
+              break;
+          }
+        }
+
+        slides.push({
           slideData: {
             time: new Date().getTime(),
             version: '2.29.0', // How to get this from the package?
             blocks,
           },
-        }
-      }).filter((slide) => slide) as IExportedDeckSlide[];
+          slidePart,
+          slideType: SlideTypes.CONTENT,
+        })
+      })
+      slides = slides.filter((slide) => slide) as IExportedDeckSlide[];
 
       console.log("turned onto slides", slides.length, slides)
       if (!slides.length) {
@@ -399,12 +434,13 @@ export class Omnibook {
         description: (render.block.properties as any).summary,
         slides: [
           {
-            slideType: SlideTypes.COVER,
             slideData: {
               time: new Date().getTime(),
               version: '2.29.0', // How to get this from the package?
               blocks: [],
             },
+            slidePart: SlideParts.INTRODUCTION,
+            slideType: SlideTypes.COVER,
           },
           ...slides,
         ],

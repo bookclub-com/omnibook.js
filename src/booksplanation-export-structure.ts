@@ -1,4 +1,5 @@
 import { OutputData } from '@editorjs/editorjs';
+import { SlideParts, SlideTypes } from './types';
 
 // ATTENTION! This file is intended to be project agnostic and should match exactly the same file in the ops tool project
 // It should not have any dependencies on any other file in either project
@@ -49,7 +50,8 @@ export interface IExportedBooksplanation {
 export interface IExportedDeckSlide {
   slideData: OutputData;
   slideHeader?: string;
-  slideType: string;
+  slidePart: SlideParts;
+  slideType: SlideTypes;
 }
 
 // This format must match exactly what is expected by the ops tool
