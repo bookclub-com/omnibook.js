@@ -366,31 +366,6 @@ export class Omnibook {
           return;
         }
 
-        const firstHeader = blocks.find((block) => block.type === 'header');
-        if (firstHeader) {
-          switch (slidePart) {
-            case SlideParts.INTRODUCTION:
-            case SlideParts.QUOTE:
-              break; // No pre-slide
-            case SlideParts.WHO_WHAT:
-            case SlideParts.WHY_MATTER:
-            case SlideParts.REAL_LIFE:
-              slides.push({
-                slideData: {
-                  time: new Date().getTime(),
-                  version: '2.29.0', // How to get this from the package?
-                  blocks: [{
-                    ...firstHeader,
-                    id: `${firstHeader.id}_section`,
-                  }]
-                },
-                slidePart,
-                slideType: SlideTypes.SECTION,
-              })
-              break;
-          }
-        }
-
         slides.push({
           slideData: {
             time: new Date().getTime(),
