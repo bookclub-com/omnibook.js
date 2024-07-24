@@ -275,6 +275,7 @@ export enum SlideParts {
   WHO_WHAT = 'whoWhat',
   WHY_MATTER = 'whyMatter',
   REAL_LIFE = 'realLife',
+  OTHER= 'other',
 }
 
 // Book section. could be a chapter, part, appendix, etc. anything that contains the other book blocks
