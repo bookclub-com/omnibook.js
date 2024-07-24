@@ -384,7 +384,7 @@ export class Omnibook {
         continue;
       }
 
-      // const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
+      const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
 
       decks.push({
         bookCoverImageUrl: this.data.cover_image
@@ -419,7 +419,7 @@ export class Omnibook {
           },
           ...slides,
         ],
-        // bookclubAiSparkImageUrl: sparkImageFileName ? `${supabaseBaseUrl}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
+        bookclubAiSparkImageUrl: sparkImageFileName ? `${supabaseBaseUrl}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
         title: (render.block.properties.text || [])[0],
       });
     }
