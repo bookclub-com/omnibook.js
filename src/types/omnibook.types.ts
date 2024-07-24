@@ -49,7 +49,7 @@ export interface IOmnibook {
   book_hash: string;
   data: IOmnibookData;
   enriched_at?: Date;
-  exported_booksplanations_at?: Date;
+  generated_booksplanations_at?: Date;
   generated_spark_decks_at?: Date;
   indexed_entities_at?: Date;
   mongo_id?: string;
