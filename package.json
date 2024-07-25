@@ -2,6 +2,7 @@
   "name": "omnibook",
   "version": "0.0.4",
   "description": "Official BookClub package for the Omnibook",
+  "packageManager": "yarn@1.22.19",
   "scripts": {
     "all": "yarn lint && yarn test && yarn build",
     "build": "tsup",
