@@ -1,4 +1,3 @@
-import { OutputBlockData } from '@editorjs/editorjs';
 import {
   BaseBlockTypes,
   IBookBlock,
@@ -9,15 +8,11 @@ import {
   IOmnibookData,
   ISection,
   ISectionBlock,
-  SlideParts,
-  SlideTypes,
-  SparkTypes,
 } from './types/omnibook.types';
 import { CoreConceptVals, INavItem } from './types/bc-epub.types';
 import { uuid } from './types/utils';
 import { BookBlock } from './book-block';
 import { Omnigraph } from './omnigraph';
-import { IExportedBooksplanation, IExportedDeck, IExportedDeckSlide } from './booksplanation-export-structure';
 
 const isSectionBlock = (block: IBookBlock): block is ISectionBlock => block.type === BaseBlockTypes.SECTION;
 
@@ -268,161 +263,4 @@ export class Omnibook {
       omnigraph: this.omnigraph.rawGraph,
     };
   }
-
-  // Converts sparks to editorjs
-  async exportBooksplanations(supabaseBaseUrl: string): Promise<IExportedBooksplanation[]> {
-    const booksplanations: IExportedBooksplanation[] = [];
-
-    for (const sparkBranch of this.getSparkBranches()) {
-      switch (sparkBranch.sparkType) {
-        case SparkTypes.BOOKSPLANATION:
-          { if (!sparkBranch.entryBlockId) continue;
-
-          const renderBlock = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId);
-          if (renderBlock.children.length === 0) continue;
-
-          const blocks: OutputBlockData[] = [];
-
-          for (const child of renderBlock.children) {
-            const newBlocks = child.block.toBooksplanationEditorJS();
-            if (newBlocks) {
-              blocks.push(...newBlocks);
-            }
-          }
-
-          const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
-
-          booksplanations.push({
-            bookCoverImageUrl: this.data.cover_image
-              ? `${supabaseBaseUrl}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
-              : undefined,
-            bookHash: this.bookHash,
-            sparkBranchId: sparkBranch.entryBlockId,
-            data: {
-              cover_image_theme: this.data.cover_image_theme,
-              cover_image: this.data.cover_image,
-              creation_date: this.data.creation_date,
-              creators: this.data.creators,
-              description: this.data.description,
-              imprint: this.data.imprint,
-              isbn: this.data.isbn,
-              lcsh: this.data.lcsh,
-              publisher: this.data.publisher,
-              subtitle: this.data.subtitle,
-              title: this.data.title,
-            },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            description: (renderBlock.block.properties as any).summary,
-            editorJS: {
-              time: new Date().getTime(),
-              version: '2.29.0', // How to get this from the package?
-              blocks,
-            },
-            bookclubAiSparkImageUrl: sparkImageFileName ? `${supabaseBaseUrl}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
-            title: (renderBlock.block.properties.text || [])[0],
-          }); 
-          break;
-        }
-        default:
-          break; // Do nothing
-      }
-    }
-    return booksplanations;
-  }
-
-  // Converts decks to editorjs
-  exportDecks = async (supabaseBaseUrl: string): Promise<IExportedDeck[]> => {
-    const decks: IExportedDeck[] = [];
-
-    this.omnigraph.rawBookBlocksWithEdges;
-    for (const sparkBranch of this.getSparkBranches()) {
-      if (sparkBranch.sparkType !== SparkTypes.DECK) continue;
-      if (!sparkBranch.entryBlockId) continue;
-
-      console.log("sparkBranch.entryBlockId", sparkBranch.entryBlockId);
-
-      // This infinate loops and I can't figure out how this is different from the sparks table. It goes infinately deep looking up the same ~20 ids
-      const render = this.omnigraph.getRenderBlocks(sparkBranch.entryBlockId!);
-      if (render.children.length === 0) continue;
-
-      let slides: IExportedDeckSlide[] = []
-      render.children.forEach((rawSlide) => {
-        const slidePart = rawSlide.block.properties.slide_part;
-        if (!slidePart) {
-          console.log("no slidePart for", rawSlide);
-          return;
-        }
-
-        // const slideType = rawSlide.block.properties.slide_type;
-        // console.log("rawSlide", rawSlide, "for", rawSlide.block.properties.slide_part, slideType)
-        // if (!slideType) {
-        //   console.log("no slideType for", rawSlide);
-        //   return;
-        // }
-
-        const blocks = rawSlide.children.flatMap((child) => child.block.toDeckEditorJS(supabaseBaseUrl, child.children));
-        if (!blocks.length) {
-          console.log("no blocks for", rawSlide);
-          return;
-        }
-
-        slides.push({
-          slideData: {
-            time: new Date().getTime(),
-            version: '2.29.0', // How to get this from the package?
-            blocks,
-          },
-          slidePart,
-          slideType: SlideTypes.CONTENT,
-        })
-      })
-      slides = slides.filter((slide) => slide) as IExportedDeckSlide[];
-
-      console.log("turned onto slides", slides.length, slides)
-      if (!slides.length) {
-        console.log("Deck with no slides", sparkBranch.entryBlockId);
-        continue;
-      }
-
-      const sparkImageFileName = this.omnigraph.getBlockById(sparkBranch.entryBlockId)?.properties.source?.[0];
-
-      decks.push({
-        bookCoverImageUrl: this.data.cover_image
-          ? `${supabaseBaseUrl}/storage/v1/object/public/book_data/${this.bookHash}/${this.data.cover_image}`
-          : undefined,
-        bookHash: this.bookHash,
-        sparkBranchId: sparkBranch.entryBlockId,
-        data: {
-          cover_image_theme: this.data.cover_image_theme,
-          cover_image: this.data.cover_image,
-          creation_date: this.data.creation_date,
-          creators: this.data.creators,
-          description: this.data.description,
-          imprint: this.data.imprint,
-          isbn: this.data.isbn,
-          lcsh: this.data.lcsh,
-          publisher: this.data.publisher,
-          subtitle: this.data.subtitle,
-          title: this.data.title,
-        },
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        description: (render.block.properties as any).summary,
-        slides: [
-          {
-            slideData: {
-              time: new Date().getTime(),
-              version: '2.29.0', // How to get this from the package?
-              blocks: [],
-            },
-            slidePart: SlideParts.INTRODUCTION,
-            slideType: SlideTypes.COVER,
-          },
-          ...slides,
-        ],
-        bookclubAiSparkImageUrl: sparkImageFileName ? `${supabaseBaseUrl}/storage/v1/object/public/spark_images/${sparkImageFileName}` : undefined,
-        title: (render.block.properties.text || [])[0],
-      });
-    }
-    return decks;
-  };
 }
