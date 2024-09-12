@@ -30,7 +30,6 @@
   "homepage": "https://github.com/bookclub-com/omnibook.js#readme",
   "devDependencies": {
     "@eslint/js": "^9.4.0",
-    "@types/crypto-js": "^4.2.2",
     "@types/eslint__js": "^8.42.3",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.10.5",
@@ -50,7 +49,6 @@
     "@editorjs/image": "^2.9.0",
     "@editorjs/list": "^1.9.0",
     "@editorjs/paragraph": "^2.10.0",
-    "crypto-js": "^4.2.0",
     "uuid": "^9.0.1",
     "xml-js": "^1.6.11"
   }
