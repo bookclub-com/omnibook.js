@@ -1,6 +1,6 @@
 {
   "name": "omnibook",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Official BookClub package for the Omnibook",
   "packageManager": "yarn@1.22.19",
   "scripts": {
