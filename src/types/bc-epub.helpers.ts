@@ -1,4 +1,3 @@
-import * as convert from 'xml-js';
 import { BookBlock } from '../book-block';
 import { Omnigraph } from '../omnigraph';
 import { ITocElement } from './bc-epub.types';
@@ -255,9 +254,11 @@ const getTextSize = (element: ITocElement): IBlockTextSize => {
       case 'caption':
         return BlockTextSizes.TEXT;
       default:
-        { const message = `${element.name} is not a text block`;
-        console.error(message, JSON.stringify(element, null, 2));
-        throw new Error(message); }
+        {
+          const message = `${element.name} is not a text block`;
+          console.error(message, JSON.stringify(element, null, 2));
+          throw new Error(message);
+        }
     }
   }
 };
@@ -342,9 +343,11 @@ const shouldFlatten = (element: ITocElement): boolean => {
     case 'hgroup':
       return true;
     default:
-      { const message = `'${element.name}' not implemented to clean and flatten`;
-      console.error(message, JSON.stringify(element, null, 2));
-      throw new Error(message); }
+      {
+        const message = `'${element.name}' not implemented to clean and flatten`;
+        console.error(message, JSON.stringify(element, null, 2));
+        throw new Error(message);
+      }
   }
 };
 
@@ -359,8 +362,6 @@ const isLeafElement = (element: ITocElement): boolean => {
 
   return result;
 };
-
-export const convertHtmlToJson = (html: string) => JSON.parse(convert.xml2json(html, { compact: false, spaces: 2 }));
 
 export const cleanAndFlattenJson = (element: ITocElement): ITocElement[] => {
   if (isLeafElement(element)) {
@@ -447,9 +448,11 @@ const getBlockType = (element: ITocElement): IBookBlockType => {
     case 'caption':
       return BaseBlockTypes.TEXT;
     default:
-      { const message = `'${element.name}' not a known block type`;
-      console.error(message, JSON.stringify(element, null, 2));
-      throw new Error(message); }
+      {
+        const message = `'${element.name}' not a known block type`;
+        console.error(message, JSON.stringify(element, null, 2));
+        throw new Error(message);
+      }
   }
 };
 
@@ -480,9 +483,11 @@ const extractBlock = (opts: BlockMappingOpts): BookBlock<IBookBlock> => {
     case BaseBlockTypes.BOOK:
       return extractBookBlock(opts);
     default:
-      { const message = `'${opts.type}' block extraction not yet implemented`;
-      console.error(message);
-      throw new Error(message); }
+      {
+        const message = `'${opts.type}' block extraction not yet implemented`;
+        console.error(message);
+        throw new Error(message);
+      }
   }
 };
 

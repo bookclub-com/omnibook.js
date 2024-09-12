@@ -1,11 +1,10 @@
-import { v4 as uuidv4 } from 'uuid';
 import crypto from 'crypto';
 import { ID } from './omnibook.types';
 import { ITocElement } from './bc-epub.types';
 
 // Converts a string to a hash, consistently
 export const hash: (str: string) => string = (str: string): string => crypto.createHash('md5').update(str).digest('hex');
-export const uuid: () => ID = uuidv4;
+export const uuid: () => ID = crypto.randomUUID;
 
 export const findObjectByKeyValue = (array: ITocElement[], key: string, searchValue: string, isExactMatch = false, returnAllMatches = false): ITocElement[] => {
   const matches: ITocElement[] = [];

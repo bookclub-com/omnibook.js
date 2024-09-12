@@ -48,8 +48,6 @@
     "@editorjs/header": "^2.8.1",
     "@editorjs/image": "^2.9.0",
     "@editorjs/list": "^1.9.0",
-    "@editorjs/paragraph": "^2.10.0",
-    "uuid": "^9.0.1",
-    "xml-js": "^1.6.11"
+    "@editorjs/paragraph": "^2.10.0"
   }
 }
