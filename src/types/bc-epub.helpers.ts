@@ -1,3 +1,4 @@
+import * as convert from 'xml-js';
 import { BookBlock } from '../book-block';
 import { Omnigraph } from '../omnigraph';
 import { ITocElement } from './bc-epub.types';
@@ -347,6 +348,8 @@ const shouldFlatten = (element: ITocElement): boolean => {
 };
 
 const isLeafElement = (element: ITocElement): boolean => ['img', 'image'].includes(element.name || '') || element.type === 'text';
+
+export const convertHtmlToJson = (html: string) => JSON.parse(convert.xml2json(html, { compact: false, spaces: 2 }));
 
 export const cleanAndFlattenJson = (element: ITocElement): ITocElement[] => {
   if (isLeafElement(element)) {
