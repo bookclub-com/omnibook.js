@@ -49,7 +49,6 @@ export interface IOmnibook {
   book_hash: string;
   data: IOmnibookData;
   enriched_at?: Date;
-  generated_booksplanations_at?: Date;
   generated_spark_decks_at?: Date;
   indexed_entities_at?: Date;
   mongo_id?: string;
@@ -111,7 +110,6 @@ export type IBNFEntityTypes = BNFEntityTypes;
 export type IBookBlockType = IBaseBlockTypes | IBNFEntityTypes;
 
 export enum SparkTypes {
-  BOOKSPLANATION = 'booksplanation',
   DECK = 'deck',
 }
 
@@ -275,7 +273,7 @@ export enum SlideParts {
   WHO_WHAT = 'whoWhat',
   WHY_MATTER = 'whyMatter',
   REAL_LIFE = 'realLife',
-  OTHER= 'other',
+  OTHER = 'other',
 }
 
 // Book section. could be a chapter, part, appendix, etc. anything that contains the other book blocks
