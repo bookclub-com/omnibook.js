@@ -271,8 +271,13 @@ export type BlockMappingOpts = IBuildBookBlock & {
   onlyImgSrc?: boolean;
 };
 
-const isImgElement = (element: ITocElement): boolean => (element.elements || []).some((child) => child.name === 'img' || child.name === 'image');
-
+const isImgElement = (element: ITocElement): boolean =>
+  (element.elements || []).reduce((acc: boolean, child: ITocElement) => {
+    if (child.name === 'img' || child.name === 'image') {
+      acc = true;
+    }
+    return acc;
+  }, false);
 
 const shouldFlatten = (element: ITocElement): boolean => {
   // i'm moving this up, as there have been multiple elements that are img elements that are not being caught
@@ -347,7 +352,17 @@ const shouldFlatten = (element: ITocElement): boolean => {
   }
 };
 
-const isLeafElement = (element: ITocElement): boolean => ['img', 'image'].includes(element.name || '') || element.type === 'text';
+const isLeafElement = (element: ITocElement): boolean => {
+  let result = false;
+  if (element.type === 'text') {
+    result = true;
+  }
+  if (element.name === 'img' || element.name === 'image') {
+    result = true;
+  }
+
+  return result;
+};
 
 export const convertHtmlToJson = (html: string) => JSON.parse(convert.xml2json(html, { compact: false, spaces: 2 }));
 
@@ -479,6 +494,42 @@ const extractBlock = (opts: BlockMappingOpts): BookBlock<IBookBlock> => {
   }
 };
 
+const mapChildElementToBlocks = (opts: BlockMappingOpts, graph: Omnigraph, defaultRelationship = IBookBlockRelationships.BOOK_HAS_BOOK_BLOCK): BookBlock<IBookBlock>[] => {
+  const { book_hash } = opts;
+
+  return (opts.element?.elements || []).reduce((blocks: BookBlock<IBookBlock>[], child: ITocElement, _idx: number) => {
+    let options: BlockMappingOpts;
+    if (child.type === 'text') {
+      options = {
+        type: BaseBlockTypes.TEXT,
+        book_hash,
+        // need to recreate what a parent element for the text could look like
+        element: {
+          type: 'element',
+          attributes: {
+            'text-block-size': BlockTextSizes.TEXT,
+          },
+          elements: [child],
+        },
+        onlyImgSrc: opts.onlyImgSrc,
+      };
+    } else {
+      options = {
+        type: getBlockType(child),
+        book_hash,
+        element: child,
+        onlyImgSrc: opts.onlyImgSrc,
+      };
+    }
+    const block = mapElementToBlock(options, graph, defaultRelationship);
+
+    if (block) {
+      blocks.push(block);
+    }
+    return blocks;
+  }, []);
+};
+
 export const createBookBlockBlockEdges = (
   mainBlock: BookBlock<IBookBlock>,
   blocks: BookBlock<IBookBlock>[],
@@ -498,44 +549,14 @@ export const createBookBlockBlockEdges = (
   }
 };
 
-export const mapElementToBlock = (opts: BlockMappingOpts, omnigraph: Omnigraph, defaultRelationship = IBookBlockRelationships.BOOK_HAS_BOOK_BLOCK): BookBlock<IBookBlock> => {
+export const mapElementToBlock = (opts: BlockMappingOpts, omni: Omnigraph, defaultRelationship = IBookBlockRelationships.BOOK_HAS_BOOK_BLOCK): BookBlock<IBookBlock> => {
   const block: BookBlock<IBookBlock> = extractBlock(opts);
-  omnigraph.addBlocks([block]);
+  omni.addBlocks([block]);
 
+  let blocks: BookBlock<IBookBlock>[];
   if (opts.type !== BaseBlockTypes.TEXT) {
-    // map children
-    const { book_hash } = opts;
-    const childBlocks: BookBlock<IBookBlock>[] = (opts.element?.elements || [])
-      .map((child: ITocElement) => {
-        let options: BlockMappingOpts;
-        if (child.type === BaseBlockTypes.TEXT) {
-          // this will stop the recursion in mapElementToBlock
-          options = {
-            type: BaseBlockTypes.TEXT,
-            book_hash,
-            // need to recreate what a parent element for the text could look like
-            element: {
-              type: 'element',
-              attributes: {
-                'text-block-size': BlockTextSizes.TEXT,
-              },
-              elements: [child],
-            },
-            onlyImgSrc: opts.onlyImgSrc,
-          };
-        } else {
-          options = {
-            type: getBlockType(child),
-            book_hash,
-            element: child,
-            onlyImgSrc: opts.onlyImgSrc,
-          };
-        }
-        return mapElementToBlock(options, omnigraph, defaultRelationship);
-      })
-      .filter((childBlock) => !!childBlock);
-
-    createBookBlockBlockEdges(block, childBlocks, omnigraph, defaultRelationship);
+    blocks = mapChildElementToBlocks(opts, omni, defaultRelationship);
+    createBookBlockBlockEdges(block, blocks, omni, defaultRelationship);
   }
 
   return block;

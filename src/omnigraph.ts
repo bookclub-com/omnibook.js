@@ -105,16 +105,19 @@ export class Omnigraph {
 
   // Adds multiple blocks to the graph
   addBlocks(blocks: BookBlock<IBookBlock>[]): void {
-    blocks.forEach((block) => {
-      this._addBlock(block);
+    const allEdges: IBookBlockRelationship[] = blocks.reduce((acc: IBookBlockRelationship[], block: BookBlock<IBookBlock>) => {
       if (block.edges) {
         try {
-          this.addEdges(deepCopy(block.edges));
+          const edges = deepCopy<IBookBlockRelationship[]>(block.edges);
+          acc.push(...edges);
         } catch (e) {
           console.error(e);
         }
       }
-    });
+      this._addBlock(block);
+      return acc;
+    }, []);
+    this.addEdges(allEdges);
   }
 
   findBlock(key: string, value: string | number): BookBlock<IBookBlock> | undefined {
